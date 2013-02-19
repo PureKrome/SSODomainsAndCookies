@@ -40,7 +40,7 @@ namespace WebApplication.Controllers
                              {
                                  Expires = DateTime.Now.AddMonths(1),
                                  Path = "/",
-                                 Domain = ConfigurationManager.AppSettings["OtherCookieDomain"]
+                                 Domain = ConfigurationManager.AppSettings["CookieDomain"]
                              };
             
             // Note: If the cookie already exists (by name), it's updated/overwritten.
