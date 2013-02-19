@@ -1,0 +1,51 @@
+﻿@model WebApplication.Models.IndexViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>SSO Domain Cookie check.</title>
+    </head>
+    <body>
+        <div>
+            
+            @if (Model != null)
+            {
+                <h1>Message</h1>
+                @Model.Message
+            }
+
+
+            <h1>Enter cookie data.</h1>
+            @using (Html.BeginForm())
+            {
+                <input type="text" name="cookieData" value="Hello World"/>
+                <input type="submit" value="Create Cookie"/>
+            }
+            
+            <hr/>
+            
+            <h1>View other domain cookie data.</h1>
+            
+            @if (Model.Cookie == null)
+            {
+                <span>No cookie with the name @Model.CookieName found.</span>
+            }
+            else
+            {
+                <ul>
+                    <li>Name: @Model.Cookie.Name</li>
+                    <li>Path: @Model.Cookie.Path</li>
+                    <li>Expires: @Model.Cookie.Expires</li>
+                    <li>Domain: @Model.Cookie.Domain</li>
+                    <li>Value: @Model.Cookie.Value</li>
+                </ul>
+            }
+
+        </div>
+    </body>
+</html>
