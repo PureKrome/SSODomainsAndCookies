@@ -13,11 +13,14 @@
     <body>
         <div>
             
-            @if (Model != null && Model.Message != null)
+            @if (Model != null)
             {
-                <h1>Message</h1>
-                <font color="red">@Model.Message</font>
-                <br/>
+                if(Model.Message != null)
+                {
+                    <h1>Message</h1>
+                    <font color="red">@Model.Message</font>
+                    <br/>   
+                }
                 if (Model.OtherCookie != null)
                 {
                     @Html.DisplayFor(model => model.OtherCookie)   
@@ -25,7 +28,7 @@
             }
 
 
-            <h1>Enter cookie data.</h1>
+            <h2>Enter cookie data.</h2>
             @using (Html.BeginForm())
             {
                 <input type="text" name="cookieData" value="Hello World"/>
@@ -34,10 +37,20 @@
             
             <hr/>
             
-            <h1>View other domain cookie data.</h1>
+            <h3>Site One Cookie:</h3>
             @if (Model != null && Model.ThisCookie != null)
             {
                 @Html.DisplayFor(model => model.ThisCookie)   
+            }
+        </div>
+        <div>
+            <h3>Cookie Request Dump:</h3>
+            @foreach (var cookieKey in Request.Cookies.AllKeys)
+            {
+                <div>
+                    <span>@Request.Cookies[cookieKey].Name</span>
+                    <span>@Request.Cookies[cookieKey].Value</span>
+                </div>
             }
         </div>
     </body>
