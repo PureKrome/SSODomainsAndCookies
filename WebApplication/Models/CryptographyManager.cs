@@ -13,8 +13,7 @@ namespace WebApplication.Models
         //Default initial vector
         private readonly byte[] _ivByte = {0x01, 0x12, 0x23, 0x34, 0x45, 0x56, 0x67, 0x78};
         private byte[] _keyByte = {};
-
-
+        
         /// <summary> 
         /// Encrypt text by key with initialization vector 
         /// </summary> 
@@ -47,14 +46,10 @@ namespace WebApplication.Models
                         encryptValue = Convert.ToBase64String(ms.ToArray());
                     }
                 }
-                catch
-                {
-                    //TODO: write log 
-                }
                 finally
                 {
-                    cs.Dispose();
-                    ms.Dispose();
+                    if (cs != null) cs.Dispose();
+                    if (ms != null) ms.Dispose();
                 }
             }
             return encryptValue;
@@ -74,7 +69,6 @@ namespace WebApplication.Models
                 MemoryStream ms = null;
                 CryptoStream cs = null;
                 value = value.Replace(" ", "+");
-                var inputByteArray = new byte[value.Length];
                 try
                 {
                     _keyByte = Encoding.UTF8.GetBytes
@@ -83,7 +77,7 @@ namespace WebApplication.Models
                     using (var des =
                         new DESCryptoServiceProvider())
                     {
-                        inputByteArray = Convert.FromBase64String(value);
+                        byte[] inputByteArray = Convert.FromBase64String(value);
                         ms = new MemoryStream();
                         cs = new CryptoStream(ms, des.CreateDecryptor
                                                       (_keyByte, _ivByte), CryptoStreamMode.Write);
@@ -93,14 +87,10 @@ namespace WebApplication.Models
                         decrptValue = encoding.GetString(ms.ToArray());
                     }
                 }
-                catch
-                {
-                    //TODO: write log 
-                }
                 finally
                 {
-                    cs.Dispose();
-                    ms.Dispose();
+                    if (cs != null) cs.Dispose();
+                    if (ms != null) ms.Dispose();
                 }
             }
             return decrptValue;
@@ -111,7 +101,6 @@ namespace WebApplication.Models
         /// </summary> 
         /// <param name="plainText">plain text</param> 
         /// <param name="salt">salt string</param> 
-        /// <param name="hashName">Hash Name</param> 
         /// <returns>string</returns> 
         public string ComputeHash(string plainText, string salt)
         {
@@ -132,8 +121,8 @@ namespace WebApplication.Models
                 else
                 {
                     // Define min and max salt sizes. 
-                    int minSaltSize = 4;
-                    int maxSaltSize = 8;
+                    const int minSaltSize = 4;
+                    const int maxSaltSize = 8;
                     // Generate a random number for the size of the salt. 
                     var random = new Random();
                     int saltSize = random.Next(minSaltSize, maxSaltSize);
@@ -148,34 +137,38 @@ namespace WebApplication.Models
                 // Copy plain text bytes into resulting array. 
                 for (int i = 0; i < plainTextBytes.Length; i++)
                 {
-                    plainTextWithSaltBytes[i] = plainTextBytes[i];
+                    if (plainTextWithSaltBytes != null) plainTextWithSaltBytes[i] = plainTextBytes[i];
                 }
                 // Append salt bytes to the resulting array. 
                 for (int i = 0; i < saltBytes.Length; i++)
                 {
-                    plainTextWithSaltBytes[plainTextBytes.Length + i] =
-                        saltBytes[i];
+                    if (plainTextWithSaltBytes != null)
+                        plainTextWithSaltBytes[plainTextBytes.Length + i] =
+                            saltBytes[i];
                 }
                 HashAlgorithm hash = new SHA1Managed();
                 // Compute hash value of our plain text with appended salt. 
-                byte[] hashBytes = hash.ComputeHash(plainTextWithSaltBytes);
-                // Create array which will hold hash and original salt bytes. 
-                var hashWithSaltBytes =
-                    new byte[hashBytes.Length + saltBytes.Length];
-                // Copy hash bytes into resulting array. 
-                for (int i = 0; i < hashBytes.Length; i++)
+                if (plainTextWithSaltBytes != null)
                 {
-                    hashWithSaltBytes[i] = hashBytes[i];
+                    byte[] hashBytes = hash.ComputeHash(plainTextWithSaltBytes);
+                    // Create array which will hold hash and original salt bytes. 
+                    var hashWithSaltBytes =
+                        new byte[hashBytes.Length + saltBytes.Length];
+                    // Copy hash bytes into resulting array. 
+                    for (int i = 0; i < hashBytes.Length; i++)
+                    {
+                        hashWithSaltBytes[i] = hashBytes[i];
+                    }
+                    // Append salt bytes to the result. 
+                    for (int i = 0; i < saltBytes.Length; i++)
+                    {
+                        hashWithSaltBytes[hashBytes.Length + i] = saltBytes[i];
+                    }
+                    // Convert result into a base64-encoded string. 
+                    string hashValue = Convert.ToBase64String(hashWithSaltBytes);
+                    // Return the result. 
+                    return hashValue;
                 }
-                // Append salt bytes to the result. 
-                for (int i = 0; i < saltBytes.Length; i++)
-                {
-                    hashWithSaltBytes[hashBytes.Length + i] = saltBytes[i];
-                }
-                // Convert result into a base64-encoded string. 
-                string hashValue = Convert.ToBase64String(hashWithSaltBytes);
-                // Return the result. 
-                return hashValue;
             }
             return string.Empty;
         }

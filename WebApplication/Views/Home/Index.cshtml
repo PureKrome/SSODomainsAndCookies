@@ -16,11 +16,12 @@
             @if (Model != null && Model.Message != null)
             {
                 <h1>Message</h1>
-                @Model.Message
+                <font color="red">@Model.Message</font>
                 <br/>
-                <span>Raw:     </span><b>@Model.OtherCookieRaw</b>
-                <br/>
-                <span>Decrpted:     </span><b>@Model.OtherCookieDecrypted</b>
+                if (Model.OtherCookie != null)
+                {
+                    @Html.DisplayFor(model => model.OtherCookie)   
+                }
             }
 
 
@@ -34,22 +35,10 @@
             <hr/>
             
             <h1>View other domain cookie data.</h1>
-            
-            @if (Model.Cookie == null)
+            @if (Model != null && Model.ThisCookie != null)
             {
-                <span>No cookie with the name @Model.CookieName found.</span>
+                @Html.DisplayFor(model => model.ThisCookie)   
             }
-            else
-            {
-                <ul>
-                    <li>Name: @Model.Cookie.Name</li>
-                    <li>Path: @Model.Cookie.Path</li>
-                    <li>Expires: @Model.Cookie.Expires</li>
-                    <li>Domain: @Model.Cookie.Domain</li>
-                    <li>Value: @Model.Cookie.Value</li>
-                </ul>
-            }
-
         </div>
     </body>
 </html>
