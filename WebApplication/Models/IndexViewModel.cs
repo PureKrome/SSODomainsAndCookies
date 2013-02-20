@@ -7,5 +7,7 @@ namespace WebApplication.Models
         public string Message { get; set; }
         public string CookieName { get; set; }
         public HttpCookie Cookie { get; set; }
+        public string OtherCookieRaw { get; set; }
+        public string OtherCookieDecrypted { get; set; }
     }
 }

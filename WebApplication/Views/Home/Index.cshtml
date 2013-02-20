@@ -13,10 +13,14 @@
     <body>
         <div>
             
-            @if (Model != null)
+            @if (Model != null && Model.Message != null)
             {
                 <h1>Message</h1>
                 @Model.Message
+                <br/>
+                <span>Raw:     </span><b>@Model.OtherCookieRaw</b>
+                <br/>
+                <span>Decrpted:     </span><b>@Model.OtherCookieDecrypted</b>
             }
 
 
