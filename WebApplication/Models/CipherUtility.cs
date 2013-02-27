@@ -7,23 +7,37 @@ namespace WebApplication.Models
 {
     public class CipherUtility
     {
-        public static string Encrypt<T>(string value, string password, string salt)
+        public static string Encrypt<T>(string value, string key, string iv)
             where T : SymmetricAlgorithm, new()
         {
-            DeriveBytes rgb = new Rfc2898DeriveBytes(password, Encoding.Unicode.GetBytes(salt));
+            //var x = new AesCryptoServiceProvider();
+            //x.KeySize = 128;
+            //x.GenerateIV();
+            //x.GenerateKey();
+
+            //var genB = x.Key;
+            //var genIV = x.IV;
+
+            //var k = Convert.ToBase64String(x.Key);
+            //var v = Convert.ToBase64String(x.IV);
+
+            key = "ZcOLAbbz13RVnQ7uPJKH8w==";
+            iv = "WuH5s2BF/UENerWnrELgfA==";
+
+            var bKey = Convert.FromBase64String(key);
+            var bIV = Convert.FromBase64String(iv);
+
 
             SymmetricAlgorithm algorithm = new T();
+            algorithm.KeySize = 128;
 
-            byte[] rgbKey = rgb.GetBytes(algorithm.KeySize >> 3);
-            byte[] rgbIv = rgb.GetBytes(algorithm.BlockSize >> 3);
-
-            ICryptoTransform transform = algorithm.CreateEncryptor(rgbKey, rgbIv);
+            ICryptoTransform transform = algorithm.CreateEncryptor(bKey, bIV);
 
             using (var buffer = new MemoryStream())
             {
                 using (var stream = new CryptoStream(buffer, transform, CryptoStreamMode.Write))
                 {
-                    using (var writer = new StreamWriter(stream, Encoding.Unicode))
+                    using (var writer = new StreamWriter(stream))
                     {
                         writer.Write(value);
                     }
@@ -33,23 +47,25 @@ namespace WebApplication.Models
             }
         }
 
-        public static string Decrypt<T>(string text, string password, string salt)
+        public static string Decrypt<T>(string text, string key, string iv)
             where T : SymmetricAlgorithm, new()
         {
-            DeriveBytes rgb = new Rfc2898DeriveBytes(password, Encoding.Unicode.GetBytes(salt));
+            key = "ZcOLAbbz13RVnQ7uPJKH8w==";
+            iv = "WuH5s2BF/UENerWnrELgfA==";
+
+            var bKey = Convert.FromBase64String(key);
+            var bIV = Convert.FromBase64String(iv);
 
             SymmetricAlgorithm algorithm = new T();
+            algorithm.KeySize = 128;
 
-            byte[] rgbKey = rgb.GetBytes(algorithm.KeySize >> 3);
-            byte[] rgbIv = rgb.GetBytes(algorithm.BlockSize >> 3);
-
-            ICryptoTransform transform = algorithm.CreateDecryptor(rgbKey, rgbIv);
+            ICryptoTransform transform = algorithm.CreateEncryptor(bKey, bIV);
 
             using (var buffer = new MemoryStream(Convert.FromBase64String(text)))
             {
                 using (var stream = new CryptoStream(buffer, transform, CryptoStreamMode.Read))
                 {
-                    using (var reader = new StreamReader(stream, Encoding.Unicode))
+                    using (var reader = new StreamReader(stream, true))
                     {
                         return reader.ReadToEnd();
                     }
