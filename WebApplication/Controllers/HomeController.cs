@@ -12,9 +12,11 @@ namespace WebApplication.Controllers
         private readonly string _thisCookieName = ConfigurationManager.AppSettings["ThisCookieName"];
         private readonly string _otherCookieName = ConfigurationManager.AppSettings["OtherCookieName"];
         private readonly string _cookieDomain = ConfigurationManager.AppSettings["CookieDomain"];
-        private readonly string _cookieSecret = ConfigurationManager.AppSettings["CookieSecret"];
-        private readonly string _cookieSalt = ConfigurationManager.AppSettings["CookieSalt"];
+        private readonly string _encryptionKey = ConfigurationManager.AppSettings["EncryptionKey"];
+        private readonly string _encryptionIv = ConfigurationManager.AppSettings["EncryptionIv"];
         
+        
+
         [HttpGet]
         public ActionResult Index()
         {
@@ -31,7 +33,7 @@ namespace WebApplication.Controllers
             {
                 try
                 {
-                    indexViewModel.ThisCookie = new EncryptedCookieViewModel(cookie.Name, cookie.Value, CipherUtility.Decrypt<AesManaged>(cookie.Value, _cookieSecret, _cookieSalt));
+                    indexViewModel.ThisCookie = new EncryptedCookieViewModel(cookie.Name, cookie.Value, CipherUtility.Decrypt<AesManaged>(cookie.Value, _encryptionKey, _encryptionIv));
                 }
                 catch (Exception exc)
                 {
@@ -45,7 +47,7 @@ namespace WebApplication.Controllers
             {
                 try
                 {
-                    indexViewModel.OtherCookie = new EncryptedCookieViewModel(otherCookie.Name, otherCookie.Value, CipherUtility.Decrypt<AesManaged>(otherCookie.Value, _cookieSecret, _cookieSalt));
+                    indexViewModel.OtherCookie = new EncryptedCookieViewModel(otherCookie.Name, otherCookie.Value, CipherUtility.Decrypt<AesManaged>(otherCookie.Value, _encryptionKey, _encryptionIv));
                 }
                 catch (Exception exc)
                 {
@@ -61,7 +63,7 @@ namespace WebApplication.Controllers
         public ActionResult Create(string cookieData)
         {
             // Hash cookie value using SHA1/DES
-            var hashed = CipherUtility.Encrypt<AesManaged>(cookieData, _cookieSecret, _cookieSalt);
+            var hashed = CipherUtility.Encrypt<AesManaged>(cookieData, _encryptionKey, _encryptionIv);
 
             // Create their cookie.
             var cookie = new HttpCookie(_otherCookieName, hashed)
